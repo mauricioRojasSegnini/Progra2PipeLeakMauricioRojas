@@ -1,6 +1,8 @@
 # Progra2PipeLeakMauricioRojas
 ### **Estudiante:** MauricioRojas
 ### **carne:** B86981
+### **Estudiante:** 
+### **carne:** 
 this is a repository for a programming project of the course of Programation 2.
 
 The player must build or rebuild a pipe through which a fluid, usually water, will pass through. **The pipe is built on a matrix area**, where fluid arises from one or more sources and must reach one or more destinations.
