@@ -2,19 +2,30 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+/*
+ * @mauricioRojasSegnini and @
+ * This is the game's program similar to Pipe Mania where it finds a solution for the level 
+ * The player must build or rebuild a pipe through which a fluid, usually water, will pass through.
+ * The pipe is built on a matrix area, where fluid arises from one or more sources and must reach one or more destinations.
+ * The program receives the status of a game in progress by standard input or in files. The content in the standard input or in the files could be text or binary.
+ * The program must validate, resolve, or convert the level it receives according to the user's choice.
+ * v.1
+*/
 
-void actionsMenu( char action[]);
+void actionsMenu( int** matriz,char action[]);
 void destruirMatriz(int **matriz, const int matrizRows);
 int** crearMatriz(const int matrizRows, const int matrizColumns);
 void cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns);
-void imprimirMatriz(int **matriz, const int matrizRows, const int matrizColumns);
+void printGame(int **matriz, const int matrizRows, const int matrizColumns);
+
 typedef struct Requirements{
-    //Crear variable para la acción e inicializar variable el valor de nulo
+    //create variable for the action required 
     char action[40];
-    //Crear variable para el nombre del archivo e inicializar variable el valor de nulo
+    //create variable for the print format required 
     char printFormat[40];
-    //Crear variable para el formato de lectura e inicializar variable el valor de nulo
+    //create variable for the print format required
     char readingFormat[40];
+    //create a variable for the file name 
     char folderName[40];
 }Requirements;
 typedef struct waterTapsOrDrains{
@@ -23,18 +34,19 @@ typedef struct waterTapsOrDrains{
 	int dir;
 }TapsOrDrains;
 
-
+/*
+ * this is the main program where it contains all the subroutines required to solve, convert or validate the level
+ * and the subrputine to print in the format that the user wants  
+ * Efe:
+ * Mod:
+ * Req: it needs the arguments of the action, the print format, the read format and the file name 
+ */
 int main(int args_count, char *args[]){
     Requirements game;
-    int waterTaps;
-    int drains;
-    int matrizRows;
-    int matrizColumns;
-    int rowWaterTap;
-    int columnWaterTap;
-    int rowDrain;
-    int columnDrain;
+    int** matriz;
+    int waterTaps, drains, matrizRows, matrizColumns, rowWaterTap, columnWaterTap, rowDrain, columnDrain;
     char dir;
+    //indetify what arguments are giving 
     for(int indice=1; indice< args_count; indice++){
         if( ((strcmp(args[indice],"validate" ) == 0) ) || ( (strcmp(args[indice],"solve" ) == 0)) || ((strcmp(args[indice],"convert" ) == 0) ) ){
             strcpy(game.action,args[indice]);
@@ -48,21 +60,27 @@ int main(int args_count, char *args[]){
         if(strcmp(args[indice],"-ot" ) == 0){
 		}
     }
+    //if the arguments is -it it reads from the standar input
     if(strcmp(game.readingFormat,"-it" ) == 0){
 		scanf("%d%d%d%d", &matrizRows, &matrizColumns, &waterTaps, &drains);
-		printf("leidos\n");
-		int** matriz= crearMatriz(matrizRows, matrizColumns);
+		
+		matriz= crearMatriz(matrizRows, matrizColumns);
 		cargarMatriz(matriz, matrizRows, matrizColumns);
-		imprimirMatriz(matriz,matrizRows,matrizColumns);
-		destruirMatriz(matriz, matrizRows);
 	}else{
+		//if the argument is
 	}
-	actionsMenu(game.action);
-    //printGame(game.printFormat, game.folderName);
-
+	//subroutine to do the action required 
+	actionsMenu(matriz,game.action);
+	printGame(matriz,matrizRows,matrizColumns);
+	destruirMatriz(matriz, matrizRows);
     return 0;
 }
-void actionsMenu(char action[]){
+/*
+ * Efe:
+ * Mod:
+ * Req:
+ */
+void actionsMenu(int** matriz, char action[]){
 	 if(strcmp( action,"validate" ) == 0){
 		printf("subrutina para validar\n");
 		
@@ -79,6 +97,11 @@ void actionsMenu(char action[]){
 	}
   
 }
+/*
+ * Efe:
+ * Mod:
+ * Req:
+ */
 int** crearMatriz(const int matrizRows, const int matrizColumns){
     int **matriz= malloc(matrizRows*sizeof(int *));
     for(int i=0; i<matrizRows; i++){
@@ -86,6 +109,11 @@ int** crearMatriz(const int matrizRows, const int matrizColumns){
     }
     return matriz;
 }
+/*
+ * Efe:
+ * Mod:
+ * Req:
+ */
 void destruirMatriz(int **matriz, const int matrizRows){
 	assert(matriz);
 	for(int f=0;f<matrizRows;f++){
@@ -93,6 +121,11 @@ void destruirMatriz(int **matriz, const int matrizRows){
 	}
 	free(matriz);
 }
+/*
+ * Efe:
+ * Mod:
+ * Req:
+ */
 void cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
     char letra;
     int num;
@@ -123,7 +156,12 @@ void cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
     }
 
 }
-void imprimirMatriz(int **matriz, const int matrizRows, const int matrizColumns){
+/*
+ * Efe:
+ * Mod:
+ * Req:
+ */
+void printGame(int **matriz, const int matrizRows, const int matrizColumns){
     for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
         for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
             printf("%d ",matriz[filas_cont][columna_cont]);        
