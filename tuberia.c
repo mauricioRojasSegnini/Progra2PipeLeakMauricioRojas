@@ -15,8 +15,9 @@
 void actionsMenu( int** matriz,char action[]);
 void destruirMatriz(int **matriz, const int matrizRows);
 int** crearMatriz(const int matrizRows, const int matrizColumns);
-void cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns);
-void printGame(int **matriz, const int matrizRows, const int matrizColumns);
+int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns);
+void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[]);
+void validateLevel(int** matriz);
 
 typedef struct Requirements{
     //create variable for the action required 
@@ -46,6 +47,7 @@ int main(int args_count, char *args[]){
     int** matriz;
     int waterTaps, drains, matrizRows, matrizColumns, rowWaterTap, columnWaterTap, rowDrain, columnDrain;
     char dir;
+    int error=0;
     //indetify what arguments are giving 
     for(int indice=1; indice< args_count; indice++){
         if( ((strcmp(args[indice],"validate" ) == 0) ) || ( (strcmp(args[indice],"solve" ) == 0)) || ((strcmp(args[indice],"convert" ) == 0) ) ){
@@ -63,16 +65,20 @@ int main(int args_count, char *args[]){
     //if the arguments is -it it reads from the standar input
     if(strcmp(game.readingFormat,"-it" ) == 0){
 		scanf("%d%d%d%d", &matrizRows, &matrizColumns, &waterTaps, &drains);
-		
 		matriz= crearMatriz(matrizRows, matrizColumns);
-		cargarMatriz(matriz, matrizRows, matrizColumns);
+		error=cargarMatriz(matriz, matrizRows, matrizColumns);
 	}else{
 		//if the argument is
 	}
-	//subroutine to do the action required 
-	actionsMenu(matriz,game.action);
-	printGame(matriz,matrizRows,matrizColumns);
-	destruirMatriz(matriz, matrizRows);
+	//if theres an error, stop
+	if(error!=0){
+		return 0;
+	}else{
+		//subroutine to do the action required 
+		actionsMenu(matriz,game.action);
+		printGame(matriz,matrizRows, matrizColumns, game.printFormat);
+		destruirMatriz(matriz, matrizRows);
+	}
     return 0;
 }
 /*
@@ -83,6 +89,8 @@ int main(int args_count, char *args[]){
 void actionsMenu(int** matriz, char action[]){
 	 if(strcmp( action,"validate" ) == 0){
 		printf("subrutina para validar\n");
+		validateLevel(matriz);
+		
 		
 	}else{
 		if(strcmp(action,"solve" ) == 0){
@@ -126,18 +134,17 @@ void destruirMatriz(int **matriz, const int matrizRows){
  * Mod:
  * Req:
  */
-void cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
+int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
     char letra;
     int num;
     for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
         for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
-			if(scanf("%d",&num)==1){
+			if((scanf("%d",&num)==1)&&(num<=9)){
 				matriz[filas_cont][columna_cont]=num;
 			}else{
 				scanf("%c",&letra);
 				
 				if(letra=='A'){
-					printf("letra%c\n",letra);
 					num=10;
 				}else if(letra=='B'){
 					num=11;
@@ -149,11 +156,15 @@ void cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
 					num=14;
 				}else if(letra=='F'){
 					num=15;
+				}else{
+					printf("wrong number");
+					return 1; // return error
 				}
 				matriz[filas_cont][columna_cont]=num;
 			}
         }
     }
+	return 0;
 
 }
 /*
@@ -161,14 +172,130 @@ void cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
  * Mod:
  * Req:
  */
-void printGame(int **matriz, const int matrizRows, const int matrizColumns){
-    for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
-        for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
-            printf("%d ",matriz[filas_cont][columna_cont]);        
+void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[]){
+	// if the print format is -ot or its the default format, print in the standard output
+	if( (strcmp( printFormat,"-ot" ) == 0)||(strcmp( printFormat,"" ) == 0) ){
+		for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
+			for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
+				printf("%d ",matriz[filas_cont][columna_cont]);        
+			}
+			putchar('\n');
 		}
-        putchar('\n');
-    }
+	}
 }
+void validateLevel(int** matriz){
+	/*
+	Subrutina para evaluar la celda del nivel
+	Para esta subrutina se va a necesitar de parámetros la fila y la columna de la celda que se va analizar 
+		Crear una variable para la dirección 
+		Asignarle el valor de la celda como visitada
+		Condicionar si la celda es 0
+			Informar del error
+		Condicionar si la celda es 1
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda (fila, columna-1, direcion)
+		Condicionar si la celda es 2
+			Cambiar el valor de la variable dirección por S
+			Ejecutar subrutina para ir al sur de la celda
+		Condicionar si la celda es 3
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda
+			Cambiar el valor de la variable dirección por S
+			Ejecutar subrutina para ir al sur de la celda
+		Condicionar si la celda es 4
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+		Condicionar si la celda es 5
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+		Condicionar si la celda es 6
+			Cambiar el valor de la variable dirección por S
+			Ejecutar subrutina para ir al sur de la celda
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+		Condicionar si la celda es 7
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda
+			Cambiar el valor de la variable dirección por S
+			Ejecutar subrutina para ir al sur de la celda
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+		Condicionar si la celda es 8
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+		Condicionar si la celda es 9
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda
+		Condicionar si la celda es A
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+			Cambiar el valor de la variable dirección por S
+			Ejecutar subrutina para ir al sur de la celda
+		Condicionar si la celda es B
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda
+			Cambiar el valor de la variable dirección por S
+			Ejecutar subrutina para ir al sur de la celda
+		Condicionar si la celda es C
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+		Condicionar si la celda es D
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+		Condicionar si la celda es E
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+			Cambiar el valor de la variable dirección por S
+			Ejecutar subrutina para ir al sur de la celda 
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+		Condicionar si la celda es F
+			Cambiar el valor de la variable dirección por N
+			Ejecutar subrutina para ir al norte de la celda
+			Cambiar el valor de la variable dirección por O
+			Ejecutar subrutina para ir al oeste de la celda
+			Cambiar el valor de la variable dirección por S    
+			Ejecutar subrutina para ir al sur de la celda
+			Cambiar el valor de la variable dirección por E
+			Ejecutar subrutina para ir al este de la celda
+	Fin de la subrutina 
+	 */
+	}
+	/*
+	Subrutina para ir a la direccion requerida 
+	Se ocupa por parámetros la fila y la columna y el punto cardinal 
+		Condicionar si la celda es la fuente
+			retornar
+		Condicionar si la celda es el desagüe
+			retornar
+		Condicionar si la celda se salió del rango
+			imprimir fuga la fila y la columna y la etiqueta
+			retornar
+		Condicionar si la celda es un cero
+			imprimir fuga la fila y la columna y la etiqueta
+			retornar
+		Condicionar si la celda no tiene su punto cardinal opuesto
+			imprimir fuga la fila y la columna y la etiqueta
+			retornar
+		Condicionar si la celda fue visitada
+			retornar
+		Condicionar si la celda tiene otro numero
+			Ejecutar subrutina para evaluar la siguiente celda
+			Mandar por parámetros la fila y la columna actual 
+	Fin de la subrutina 
+	*/
 
 
 
