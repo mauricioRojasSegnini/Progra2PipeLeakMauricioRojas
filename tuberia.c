@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -28,14 +29,15 @@ typedef struct Requirements{
     //create a variable for the file name 
     char folderName[40];
 }Requirements;
-void goTo(int **matriz,int row, int column, char dir);
-void actionsMenu( int** matriz,char action[], TapsOrDrains *tapsOrDrainsArray);
+
+void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns);
+void actionsMenu( int** matriz,char action[], TapsOrDrains *tapsOrDrainsArray, int taps, int drains,int matrizRows,int matrizColumns);
 void destruirMatriz(int **matriz, const int matrizRows);
 int** crearMatriz(const int matrizRows, const int matrizColumns);
 int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns);
 void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[]);
-void validateLevel(int** matriz, int row, int column, char dir);
-
+void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns);
+void printLeak(int x, int y, char dir);
 /*
  * this is the main program where it contains all the subroutines required to solve, convert or validate the level
  * and the subrputine to print in the format that the user wants  
@@ -81,7 +83,6 @@ int main(int args_count, char *args[]){
 			tapsOrDrainsArray[numOfDrains].y=y;
 			tapsOrDrainsArray[numOfDrains].dir =dir;
 		}
-		
 		matriz= crearMatriz(matrizRows, matrizColumns);
 		error=cargarMatriz(matriz, matrizRows, matrizColumns);
 	}else{
@@ -92,7 +93,7 @@ int main(int args_count, char *args[]){
 		return 0;
 	}else{
 		//subroutine to do the action required 
-		actionsMenu(matriz, game.action, tapsOrDrainsArray);
+		actionsMenu(matriz, game.action, tapsOrDrainsArray,waterTaps,drains, matrizRows, matrizColumns);
 		printGame(matriz,matrizRows, matrizColumns, game.printFormat);
 		destruirMatriz(matriz, matrizRows);
 	}
@@ -103,11 +104,9 @@ int main(int args_count, char *args[]){
  * Mod:
  * Req:
  */
-void actionsMenu(int** matriz, char action[], TapsOrDrains *tapsOrDrainsArray){
+void actionsMenu(int** matriz, char action[], TapsOrDrains *tapsOrDrainsArray,int taps, int drains,int matrizRows,int matrizColumns){
 	 if(strcmp( action,"validate" ) == 0){
-		validateLevel( matriz, tapsOrDrainsArray[0].x,tapsOrDrainsArray[0].y, tapsOrDrainsArray[0].dir);
-		
-		
+		validateLevel( matriz, tapsOrDrainsArray[0].x-1,tapsOrDrainsArray[0].y-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray,taps,drains, matrizRows,matrizColumns);
 	}else{
 		if(strcmp(action,"solve" ) == 0){
 			printf("subrutina para resolver\n");
@@ -200,9 +199,9 @@ void printGame(int **matriz, const int matrizRows, const int matrizColumns, char
 		}
 	}
 }
-void validateLevel(int** matriz, int row, int column, char dir){
-	int rowCell=row-1;
-	int columnCell=column-1;
+void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns){
+	int rowCell=row;
+	int columnCell=column;
 	//Subrutina para evaluar la celda del nivel
 	//Asignarle el valor de la celda como visitada
 	//Condicionar si la celda es 0
@@ -224,7 +223,7 @@ void validateLevel(int** matriz, int row, int column, char dir){
 		//Ejecutar subrutina para ir al oeste de la celda
 		//Cambiar el valor de la variable dirección por S
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell+0,'S');
+		//goTo(matriz,rowCell+1,columnCell+0,'S',tapsOrDrainsArray,taps, drains);
 	}else
 		
 		/*
@@ -251,10 +250,13 @@ void validateLevel(int** matriz, int row, int column, char dir){
 	//Condicionar si la celda es 7
 		//Cambiar el valor de la variable dirección por O
 		//Ejecutar subrutina para ir al oeste de la celda
+		//goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
 		//Cambiar el valor de la variable dirección por S
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
 		//Ejecutar subrutina para ir al sur de la celda
 		//Cambiar el valor de la variable dirección por E
 		//Ejecutar subrutina para ir al este de la celda
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
 	}else
 		/*
 	Condicionar si la celda es 8
@@ -280,11 +282,12 @@ void validateLevel(int** matriz, int row, int column, char dir){
 		*/
 	//Condicionar si la celda es 12
 	if(matriz[rowCell][columnCell]==12){
-		printf("estoy en la 12  %d %d %c\n",row, column, dir);
 		//Cambiar el valor de la variable dirección por N
 		//Ejecutar subrutina para ir al norte de la celda
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
 		//Cambiar el valor de la variable dirección por E
 		//Ejecutar subrutina para ir al este de la celda
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
 	}else
 	//Condicionar si la celda es 13
 	if(matriz[rowCell][columnCell]==13){
@@ -318,30 +321,53 @@ Fin de la subrutina
 
 //Subrutina para ir a la direccion requerida 
 //Se ocupa por parámetros la fila y la columna y el punto cardinal 
-void goTo(int **matriz,int row, int column, char dir){
-	//Condicionar si la celda es la fuente
-		//retornar
-	//Condicionar si la celda es el desagüe
-		//retornar
+void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns){
 	//Condicionar si la celda se salió del rango
-		//imprimir fuga la fila y la columna y la etiqueta
-		//retornar
-	//Condicionar si la celda es un cero
-	if(matriz[row][column]==0){
-		//imprimir fuga la fila y la columna y la etiqueta
-		printf("leak in %d %d %c\n",row, column, dir);
-		//retornar
-		return;
+	if((row>=0 && column>=0) &&(row<matrizRows&&column<matrizColumns)){
+		//Condicionar si la celda es un cero
+		if(matriz[row][column]==0){
+			printLeak(row, column, dir);
+			//printf("leak in %d %d %c\n",row, column, dir);
+			return;
+		}
+		//Condicionar si la celda no tiene su punto cardinal opuesto
+			//imprimir fuga la fila y la columna y la etiqueta
+			//retornar
+		//Condicionar si la celda fue visitada
+			//retornar
+		//Condicionar si la celda tiene otro numero
+		if(matriz[row][column]>=0 && matriz[row][column]<=15){
+			//Ejecutar subrutina para evaluar la siguiente celda
+			//Mandar por parámetros la fila y la columna actual
+			validateLevel(matriz, row, column, dir, tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns);
+		} 
+	}else{
+		//Condicionar si la celda es la fuente o el desague
+		for(int waterTapOrDrains=0; waterTapOrDrains<taps+drains; waterTapOrDrains++){
+			if( (tapsOrDrainsArray[waterTapOrDrains].dir==dir) ){
+				return;
+			}
+		}
+		printf("leak %d %d %c\n",row, column, dir);
 	}
-	//Condicionar si la celda no tiene su punto cardinal opuesto
-		//imprimir fuga la fila y la columna y la etiqueta
-		//retornar
-	//Condicionar si la celda fue visitada
-		//retornar
-	//Condicionar si la celda tiene otro numero
-		//Ejecutar subrutina para evaluar la siguiente celda
-		//Mandar por parámetros la fila y la columna actual 
-}//Fin de la subrutina 
+//Fin de la subrutina 
+}
+void printLeak(int x, int y, char dir){
+		int row=x+1;
+		int col=y+1;
+		if(dir=='N'){
+			printf("leak %d %d %c\n",row+1, col, dir);
+		}
+		if(dir=='S'){
+			printf("leak %d %d %c\n",row-1, col, dir);
+		}
+		if(dir=='E'){
+			printf("leak %d %d %c\n",row, col-1, dir);
+		}
+		if(dir=='O'){
+			printf("leak %d %d %c\n",row, col+1, dir);
+		}
+}
 
 
 
