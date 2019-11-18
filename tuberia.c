@@ -215,30 +215,29 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 	if( (matriz[rowCell][columnCell])==0){
 		//Informar del error
 		printf("leak %d %d %c\n",row, column, dir);
-	}
-	/*
-	Condicionar si la celda es 1
-		Cambiar el valor de la variable dirección por O
-		Ejecutar subrutina para ir al oeste de la celda (fila, columna-1, direcion)
-	Condicionar si la celda es 2
-		Cambiar el valor de la variable dirección por S
-		Ejecutar subrutina para ir al sur de la celda
-		*/
+	}else
+	//Condicionar si la celda es 1
+	if(matriz[rowCell][columnCell]==1){
+		//Cambiar el valor de la variable dirección por O
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
+	//Condicionar si la celda es 2
+	if(matriz[rowCell][columnCell]==2){
+		//Ejecutar subrutina para ir al sur de la celda
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
 	//Condicionar si la celda es 3
 	if(matriz[rowCell][columnCell]==3){
-		//Cambiar el valor de la variable dirección por O
 		//Ejecutar subrutina para ir al oeste de la celda
-		//Cambiar el valor de la variable dirección por S
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
 		//Ejecutar subrutina para ir al sur de la celda
-		//goTo(matriz,rowCell+1,columnCell+0,'S',tapsOrDrainsArray,taps, drains);
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
 	}else
-		
-		/*
-	Condicionar si la celda es 4
-		Cambiar el valor de la variable dirección por E
-		Ejecutar subrutina para ir al este de la celda
-		//goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
-		*/
+	//Condicionar si la celda es 4
+	if(matriz[rowCell][columnCell]==4){
+		//Ejecutar subrutina para ir al este de la celda
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
 	//Condicionar si la celda es 5
 	if(matriz[rowCell][columnCell]==5){
 		//Ejecutar subrutina para ir al oeste de la celda
@@ -248,11 +247,10 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 	}else
 	//Condicionar si la celda es 6
 	if(matriz[rowCell][columnCell]==6){
-		//Cambiar el valor de la variable dirección por S
 		//Ejecutar subrutina para ir al sur de la celda
-		//Cambiar el valor de la variable dirección por E
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
 		//Ejecutar subrutina para ir al este de la celda
-		//goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
 	}else 
 	//Condicionar si la celda es 7
 	if(matriz[rowCell][columnCell]==7){
@@ -263,32 +261,34 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 		//Ejecutar subrutina para ir al este de la celda
 		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
 	}else
-		/*
-	Condicionar si la celda es 8
-		Cambiar el valor de la variable dirección por N
-		Ejecutar subrutina para ir al norte de la celda
-		//goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
-	Condicionar si la celda es 9
-		Cambiar el valor de la variable dirección por N
-		Ejecutar subrutina para ir al norte de la celda
-		//goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
-		Cambiar el valor de la variable dirección por O
-		Ejecutar subrutina para ir al oeste de la celda
-	Condicionar si la celda es A
-		Cambiar el valor de la variable dirección por N
-		Ejecutar subrutina para ir al norte de la celda
-		//goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
-		Cambiar el valor de la variable dirección por S
-		Ejecutar subrutina para ir al sur de la celda
-	Condicionar si la celda es B
-		Cambiar el valor de la variable dirección por N
-		Ejecutar subrutina para ir al norte de la celda
-		//goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns);
-		Cambiar el valor de la variable dirección por O
-		Ejecutar subrutina para ir al oeste de la celda
-		Cambiar el valor de la variable dirección por S
-		Ejecutar subrutina para ir al sur de la celda
-		*/
+	//Condicionar si la celda es 8
+	if(matriz[rowCell][columnCell]== 8){
+		//Ejecutar subrutina para ir al norte de la celda
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
+	//Condicionar si la celda es 9
+	if(matriz[rowCell][columnCell]==9){
+		//Ejecutar subrutina para ir al norte de la celda
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		//Ejecutar subrutina para ir al oeste de la celda
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
+	//Condicionar si la celda es A	
+	if(matriz[rowCell][columnCell]==10){
+		//Ejecutar subrutina para ir al norte de la celda
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);	
+		//Ejecutar subrutina para ir al sur de la celda
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
+	//Condicionar si la celda es B
+	if(matriz[rowCell][columnCell]==11 ){
+		//Ejecutar subrutina para ir al norte de la celda
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		//Ejecutar subrutina para ir al oeste de la celda
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		//Ejecutar subrutina para ir al sur de la celda
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
 	//Condicionar si la celda es 12
 	if(matriz[rowCell][columnCell]==12){
 		//Ejecutar subrutina para ir al norte de la celda
@@ -304,19 +304,28 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
 		//Ejecutar subrutina para ir al este de la celda
 		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
+	//Condicionar si la celda es E
+	if(matriz[rowCell][columnCell]==14){
+		//Ejecutar subrutina para ir al norte de la celda
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		//Ejecutar subrutina para ir al sur de la celda
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz); 
+		//Ejecutar subrutina para ir al este de la celda
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+	}else
+	//Condicionar si la celda es F
+	if(matriz[rowCell][columnCell]==15){
+		//Ejecutar subrutina para ir al norte de la celda
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		//Ejecutar subrutina para ir al oeste de la celda
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);   
+		//Ejecutar subrutina para ir al sur de la celda
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz); 
+		//Ejecutar subrutina para ir al este de la celda
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
 	}
-		/*
-	Condicionar si la celda es E
-		Ejecutar subrutina para ir al norte de la celda
-		Ejecutar subrutina para ir al sur de la celda 
-		Ejecutar subrutina para ir al este de la celda
-	Condicionar si la celda es F
-		Ejecutar subrutina para ir al norte de la celda
-		Ejecutar subrutina para ir al oeste de la celda   
-		Ejecutar subrutina para ir al sur de la celda
-		Ejecutar subrutina para ir al este de la celda
-Fin de la subrutina 
- */
+//Fin de la subrutina 
 }
 
 //Subrutina para ir a la direccion requerida 
@@ -335,6 +344,37 @@ void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 			return;
 		}
 		//Condicionar si la celda no tiene su punto cardinal opuesto
+		if(dir=='N'){
+			if( (matriz[row][column]==1) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==12) ||(matriz[row][column]==13) ){
+				printLeak(row, column, dir);
+				return;
+			}
+			
+		}else{
+			if(dir=='O'){
+				if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==10) ||(matriz[row][column]==11) ){
+							printLeak(row, column, dir);
+							return;
+						}
+			
+			}else{
+				if(dir=='E'){
+					if( (matriz[row][column]==2) ||(matriz[row][column]==4) ||(matriz[row][column]==6) ||(matriz[row][column]==8) ||(matriz[row][column]==10) ||(matriz[row][column]==12) ||(matriz[row][column]==14) ){
+							printLeak(row, column, dir);
+							return;
+						}
+				}else{
+					if(dir=='S'){
+						if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==6) ||(matriz[row][column]==7) ){
+							printLeak(row, column, dir);
+							return;
+						}
+					}else{
+					
+					}
+				}
+			}	
+		}
 			//imprimir fuga la fila y la columna y la etiqueta
 			//retornar
 		//Condicionar si la celda tiene otro numero
@@ -343,6 +383,21 @@ void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 			validateLevel(matriz, row, column, dir, tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns,copyMatriz);
 		} 
 	}else{
+		int rowC=row+1;
+		int colC=column+1;
+		if(dir=='N'){
+			rowC=rowC+1;
+		}
+		if(dir=='S'){
+			rowC=rowC-1;
+		}
+		if(dir=='E'){
+			colC=colC-1;
+		}
+		if(dir=='O'){
+			colC=colC+1;
+		}
+		printf("soy fuente %d %d %c\n", row, column, dir);
 		//Condicionar si la celda es la fuente o el desague
 		for(int waterTapOrDrains=0; waterTapOrDrains<taps+drains; waterTapOrDrains++){
 			if( (tapsOrDrainsArray[waterTapOrDrains].dir==dir) ){
@@ -381,12 +436,3 @@ int** copy(int** matriz, int matrizRows, int matrizColumns){
 	}
 	return copy;
 }
-
-
-
-
-
-
-
-
-
