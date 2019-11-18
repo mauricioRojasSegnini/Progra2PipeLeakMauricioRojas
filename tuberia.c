@@ -209,8 +209,8 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 	//Subrutina para evaluar la celda del nivel
 	//Asignarle el valor de la celda como visitada
 	copyMatriz[rowCell][columnCell]=-1;
-	printGame(copyMatriz,matrizRows, matrizColumns, "-ot");
-	printf("\n");
+	//printGame(copyMatriz,matrizRows, matrizColumns, "-ot");
+	//printf("\n");
 	//Condicionar si la celda es 0
 	if( (matriz[rowCell][columnCell])==0){
 		//Informar del error
@@ -397,14 +397,13 @@ void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 		if(dir=='O'){
 			colC=colC+1;
 		}
-		printf("soy fuente %d %d %c\n", row, column, dir);
 		//Condicionar si la celda es la fuente o el desague
 		for(int waterTapOrDrains=0; waterTapOrDrains<taps+drains; waterTapOrDrains++){
-			if( (tapsOrDrainsArray[waterTapOrDrains].dir==dir) ){
+			if( (tapsOrDrainsArray[waterTapOrDrains].dir==dir)&&(tapsOrDrainsArray[waterTapOrDrains].x==rowC)&&(tapsOrDrainsArray[waterTapOrDrains].y==colC) ){
 				return;
 			}
 		}
-		printf("leak %d %d %c\n",row, column, dir);
+		printLeak(row, column, dir);
 	}
 //Fin de la subrutina 
 }
@@ -436,3 +435,7 @@ int** copy(int** matriz, int matrizRows, int matrizColumns){
 	}
 	return copy;
 }
+
+
+
+
