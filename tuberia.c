@@ -1,4 +1,5 @@
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -30,7 +31,7 @@ typedef struct Requirements{
     char folderName[40];
 }Requirements;
 
-void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz);
+bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz);
 void actionsMenu( int** matriz,char action[], TapsOrDrains *tapsOrDrainsArray, int taps, int drains,int matrizRows,int matrizColumns);
 void destruirMatriz(int **matriz, const int matrizRows);
 int** crearMatriz(const int matrizRows, const int matrizColumns);
@@ -52,6 +53,7 @@ int main(int args_count, char *args[]){
     int** matriz;
     int waterTaps, drains, matrizRows, matrizColumns, rowWaterTap, columnWaterTap, rowDrain, columnDrain;
     int error=0;
+    
     //indetify what arguments are giving 
     strcpy(game.printFormat,"-ot" ); //default format
     for(int indice=1; indice< args_count; indice++){
@@ -330,44 +332,44 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 
 //Subrutina para ir a la direccion requerida 
 //Se ocupa por parámetros la fila y la columna y el punto cardinal 
-void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz){
+bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz){
 	//Condicionar si la celda se salió del rango
 	if((row>=0 && column>=0) &&(row<matrizRows&&column<matrizColumns)){
 		//Condicionar si la celda fue visitada
 		if(copyMatriz[row][column]==-1){
 			//retornar
-			return;
+			return true;
 		}
 		//Condicionar si la celda es un cero
 		if(matriz[row][column]==0){
 			printLeak(row, column, dir);
-			return;
+			return false;
 		}
 		//Condicionar si la celda no tiene su punto cardinal opuesto
 		if(dir=='N'){
 			if( (matriz[row][column]==1) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==12) ||(matriz[row][column]==13) ){
 				printLeak(row, column, dir);
-				return;
+				return false;
 			}
 			
 		}else{
 			if(dir=='O'){
 				if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==10) ||(matriz[row][column]==11) ){
 							printLeak(row, column, dir);
-							return;
+							return false;
 						}
 			
 			}else{
 				if(dir=='E'){
 					if( (matriz[row][column]==2) ||(matriz[row][column]==4) ||(matriz[row][column]==6) ||(matriz[row][column]==8) ||(matriz[row][column]==10) ||(matriz[row][column]==12) ||(matriz[row][column]==14) ){
 							printLeak(row, column, dir);
-							return;
+							return false;
 						}
 				}else{
 					if(dir=='S'){
 						if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==6) ||(matriz[row][column]==7) ){
 							printLeak(row, column, dir);
-							return;
+							return false;
 						}
 					}else{
 					
@@ -400,11 +402,12 @@ void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 		//Condicionar si la celda es la fuente o el desague
 		for(int waterTapOrDrains=0; waterTapOrDrains<taps+drains; waterTapOrDrains++){
 			if( (tapsOrDrainsArray[waterTapOrDrains].dir==dir)&&(tapsOrDrainsArray[waterTapOrDrains].x==rowC)&&(tapsOrDrainsArray[waterTapOrDrains].y==colC) ){
-				return;
+				return true;
 			}
 		}
 		printLeak(row, column, dir);
 	}
+	return true;
 //Fin de la subrutina 
 }
 void printLeak(int x, int y, char dir){
@@ -435,7 +438,4 @@ int** copy(int** matriz, int matrizRows, int matrizColumns){
 	}
 	return copy;
 }
-
-
-
 
