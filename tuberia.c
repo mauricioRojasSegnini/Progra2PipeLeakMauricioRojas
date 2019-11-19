@@ -36,7 +36,7 @@ void actionsMenu( int** matriz,char action[], TapsOrDrains *tapsOrDrainsArray, i
 void destruirMatriz(int **matriz, const int matrizRows);
 int** crearMatriz(const int matrizRows, const int matrizColumns);
 int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns);
-void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[]);
+void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[], char folder[]);
 void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz);
 void printLeak(int x, int y, char dir);
 int** copy(int** matriz, int matrizRows, int matrizColumns);
@@ -56,17 +56,25 @@ int main(int args_count, char *args[]){
     
     //indetify what arguments are giving 
     strcpy(game.printFormat,"-ot" ); //default format
+    strcpy(game.folderName,""); //NULL
     for(int indice=1; indice< args_count; indice++){
         if( ((strcmp(args[indice],"validate" ) == 0) ) || ( (strcmp(args[indice],"solve" ) == 0)) || ((strcmp(args[indice],"convert" ) == 0) ) ){
+            //action
             strcpy(game.action,args[indice]);
-        }
-        if( ((strcmp(args[indice],"-it" ) == 0)) || ((strcmp(args[indice],"-ib" ) == 0)) ){
-            strcpy(game.readingFormat,args[indice]);
-        }
-        if( (strcmp(args[indice],"-ot" ) == 0) || (strcmp(args[indice],"-ob" )== 0)|| (strcmp(args[indice],"-o" )== 0)) {
-            strcpy(game.printFormat,args[indice]);
-        }
-        
+        }else{
+			if( ((strcmp(args[indice],"-it" ) == 0)) || ((strcmp(args[indice],"-ib" ) == 0)) ){
+				//formato de lectura
+				strcpy(game.readingFormat,args[indice]);
+			}else{
+				if( (strcmp(args[indice],"-ot" ) == 0) || (strcmp(args[indice],"-ob" )== 0)|| (strcmp(args[indice],"-o" )== 0)) {
+					//formato de salida
+					strcpy(game.printFormat,args[indice]);
+				}else{
+					//nombre del archivo 
+					strcpy(game.folderName,args[indice]);
+				}
+			}
+		}
     }
     //if the arguments is -it it reads from the standar input
     if(strcmp(game.readingFormat,"-it" ) == 0){
@@ -97,7 +105,7 @@ int main(int args_count, char *args[]){
 	}else{
 		//subroutine to do the action required 
 		actionsMenu(matriz, game.action, tapsOrDrainsArray,waterTaps,drains, matrizRows, matrizColumns);
-		printGame(matriz,matrizRows, matrizColumns, game.printFormat);
+		printGame(matriz,matrizRows, matrizColumns, game.printFormat, game.folderName);
 		destruirMatriz(matriz, matrizRows);
 	}
     return 0;
@@ -191,15 +199,26 @@ int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
  * Mod:
  * Req:
  */
-void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[]){
+void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[], char folder[]){
 
 	// if the print format is -ot or its the default format, print in the standard output
 	putchar('\n');
+	FILE * fichero;
+	fichero = fopen( folder ,"w");
 	if( (strcmp( printFormat,"-ot" ) == 0)||(strcmp( printFormat,"" ) == 0) ){
 		for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
 			for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
-				printf("%d ",matriz[filas_cont][columna_cont]);        
+				if(fichero != NULL){
+					char celda[12];
+					sprintf(celda,"%d",matriz[filas_cont][columna_cont]);
+					fputs(celda,fichero);
+					fputs(" ",fichero);
+				}else{
+					printf("%d ",matriz[filas_cont][columna_cont]);
+				}
+				    
 			}
+			if(fichero != NULL){fputs("\n",fichero);}
 			putchar('\n');
 		}
 	}
@@ -438,4 +457,7 @@ int** copy(int** matriz, int matrizRows, int matrizColumns){
 	}
 	return copy;
 }
+
+
+
 
