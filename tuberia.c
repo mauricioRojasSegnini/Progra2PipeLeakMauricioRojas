@@ -31,14 +31,14 @@ typedef struct Requirements{
     char folderName[40];
 }Requirements;
 
-bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz);
-void actionsMenu( int** matriz,char action[], TapsOrDrains *tapsOrDrainsArray, int taps, int drains,int matrizRows,int matrizColumns);
+bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
+void actionsMenu( int** matriz,char action[], TapsOrDrains *tapsOrDrainsArray, int taps, int drains,int matrizRows,int matrizColumns, Requirements game);
 void destruirMatriz(int **matriz, const int matrizRows);
 int** crearMatriz(const int matrizRows, const int matrizColumns);
 int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns);
 void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[], char folder[]);
-void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz);
-void printLeak(int x, int y, char dir);
+void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
+void printLeak(int x, int y, char dir,Requirements game);
 int** copy(int** matriz, int matrizRows, int matrizColumns);
 /*
  * this is the main program where it contains all the subroutines required to solve, convert or validate the level
@@ -104,7 +104,7 @@ int main(int args_count, char *args[]){
 		return 0;
 	}else{
 		//subroutine to do the action required 
-		actionsMenu(matriz, game.action, tapsOrDrainsArray,waterTaps,drains, matrizRows, matrizColumns);
+		actionsMenu(matriz, game.action, tapsOrDrainsArray,waterTaps,drains, matrizRows, matrizColumns, game);
 		printGame(matriz,matrizRows, matrizColumns, game.printFormat, game.folderName);
 		destruirMatriz(matriz, matrizRows);
 	}
@@ -115,10 +115,10 @@ int main(int args_count, char *args[]){
  * Mod:
  * Req:
  */
-void actionsMenu(int** matriz, char action[], TapsOrDrains *tapsOrDrainsArray,int taps, int drains,int matrizRows,int matrizColumns){
+void actionsMenu(int** matriz, char action[], TapsOrDrains *tapsOrDrainsArray,int taps, int drains,int matrizRows,int matrizColumns,Requirements game){
 	 if(strcmp( action,"validate" ) == 0){
 		 int **copyMatriz=copy(matriz, matrizRows, matrizColumns);
-		validateLevel( matriz, tapsOrDrainsArray[0].x-1,tapsOrDrainsArray[0].y-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray,taps,drains, matrizRows,matrizColumns,copyMatriz);
+		validateLevel( matriz, tapsOrDrainsArray[0].x-1,tapsOrDrainsArray[0].y-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray,taps,drains, matrizRows,matrizColumns,copyMatriz, game);
 	}else{
 		if(strcmp(action,"solve" ) == 0){
 			printf("subrutina para resolver\n");
@@ -200,11 +200,11 @@ int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
  * Req:
  */
 void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[], char folder[]){
-
 	// if the print format is -ot or its the default format, print in the standard output
 	putchar('\n');
 	FILE * fichero;
-	fichero = fopen( folder ,"w");
+	fichero = fopen( folder ,"a");
+	fputs("\n",fichero);
 	if( (strcmp( printFormat,"-ot" ) == 0)||(strcmp( printFormat,"" ) == 0) ){
 		for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
 			for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
@@ -223,135 +223,134 @@ void printGame(int **matriz, const int matrizRows, const int matrizColumns, char
 		}
 	}
 }
-void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz){
+void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
 	
 	int rowCell=row;
 	int columnCell=column;
 	//Subrutina para evaluar la celda del nivel
 	//Asignarle el valor de la celda como visitada
 	copyMatriz[rowCell][columnCell]=-1;
-	//printGame(copyMatriz,matrizRows, matrizColumns, "-ot");
-	//printf("\n");
 	//Condicionar si la celda es 0
 	if( (matriz[rowCell][columnCell])==0){
 		//Informar del error
-		printf("leak %d %d %c\n",row, column, dir);
+		printLeak(row, column, dir, game);
+		//printf("leak %d %d %c\n",row, column, dir);
 	}else
 	//Condicionar si la celda es 1
 	if(matriz[rowCell][columnCell]==1){
 		//Cambiar el valor de la variable dirección por O
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 2
 	if(matriz[rowCell][columnCell]==2){
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 3
 	if(matriz[rowCell][columnCell]==3){
 		//Ejecutar subrutina para ir al oeste de la celda
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 4
 	if(matriz[rowCell][columnCell]==4){
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 5
 	if(matriz[rowCell][columnCell]==5){
 		//Ejecutar subrutina para ir al oeste de la celda
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 6
 	if(matriz[rowCell][columnCell]==6){
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else 
 	//Condicionar si la celda es 7
 	if(matriz[rowCell][columnCell]==7){
 		//Ejecutar subrutina para ir al oeste de la celda
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 8
 	if(matriz[rowCell][columnCell]== 8){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 9
 	if(matriz[rowCell][columnCell]==9){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al oeste de la celda
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es A	
 	if(matriz[rowCell][columnCell]==10){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);	
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);	
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es B
 	if(matriz[rowCell][columnCell]==11 ){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al oeste de la celda
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 12
 	if(matriz[rowCell][columnCell]==12){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es 13
 	if(matriz[rowCell][columnCell]==13){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al oeste de la celda
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es E
 	if(matriz[rowCell][columnCell]==14){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz); 
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game); 
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
 	//Condicionar si la celda es F
 	if(matriz[rowCell][columnCell]==15){
 		//Ejecutar subrutina para ir al norte de la celda
-		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al oeste de la celda
-		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);   
+		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);   
 		//Ejecutar subrutina para ir al sur de la celda
-		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz); 
+		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game); 
 		//Ejecutar subrutina para ir al este de la celda
-		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz);
+		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}
 //Fin de la subrutina 
 }
 
 //Subrutina para ir a la direccion requerida 
 //Se ocupa por parámetros la fila y la columna y el punto cardinal 
-bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz){
+bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
 	//Condicionar si la celda se salió del rango
 	if((row>=0 && column>=0) &&(row<matrizRows&&column<matrizColumns)){
 		//Condicionar si la celda fue visitada
@@ -361,33 +360,33 @@ bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 		}
 		//Condicionar si la celda es un cero
 		if(matriz[row][column]==0){
-			printLeak(row, column, dir);
+			printLeak(row, column, dir, game);
 			return false;
 		}
 		//Condicionar si la celda no tiene su punto cardinal opuesto
 		if(dir=='N'){
 			if( (matriz[row][column]==1) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==12) ||(matriz[row][column]==13) ){
-				printLeak(row, column, dir);
+				printLeak(row, column, dir, game);
 				return false;
 			}
 			
 		}else{
 			if(dir=='O'){
 				if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==10) ||(matriz[row][column]==11) ){
-							printLeak(row, column, dir);
+							printLeak(row, column, dir, game);
 							return false;
 						}
 			
 			}else{
 				if(dir=='E'){
 					if( (matriz[row][column]==2) ||(matriz[row][column]==4) ||(matriz[row][column]==6) ||(matriz[row][column]==8) ||(matriz[row][column]==10) ||(matriz[row][column]==12) ||(matriz[row][column]==14) ){
-							printLeak(row, column, dir);
+							printLeak(row, column, dir, game);
 							return false;
 						}
 				}else{
 					if(dir=='S'){
 						if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==6) ||(matriz[row][column]==7) ){
-							printLeak(row, column, dir);
+							printLeak(row, column, dir, game);
 							return false;
 						}
 					}else{
@@ -401,7 +400,7 @@ bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 		//Condicionar si la celda tiene otro numero
 		if(matriz[row][column]>=0 && matriz[row][column]<=15){
 			//Ejecutar subrutina para evaluar la siguiente celda
-			validateLevel(matriz, row, column, dir, tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns,copyMatriz);
+			validateLevel(matriz, row, column, dir, tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		} 
 	}else{
 		int rowC=row+1;
@@ -424,26 +423,75 @@ bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 				return true;
 			}
 		}
-		printLeak(row, column, dir);
+		printLeak(row, column, dir, game);
 	}
 	return true;
 //Fin de la subrutina 
 }
-void printLeak(int x, int y, char dir){
+void printLeak(int x, int y, char dir,Requirements game){
+		FILE * fichero;
+		fichero = fopen( game.folderName ,"a");
 		int row=x+1;
 		int col=y+1;
-		if(dir=='N'){
-			printf("leak %d %d %c\n",row+1, col, dir);
+		if(strcmp(game.folderName,"" ) != 0){
+			char rowNumber[12];
+			char colNumber[12];
+			if(dir=='N'){
+				sprintf(rowNumber,"%d",row+1);
+				sprintf(colNumber,"%d",col);
+				fputs("leak ",fichero);
+				fputs(rowNumber,fichero);
+				fputs(" ",fichero);
+				fputs(colNumber,fichero);
+				fputs(" ",fichero);
+				fputc(dir,fichero);
+			}
+			if(dir=='S'){
+				sprintf(rowNumber,"%d",row-1);
+				sprintf(colNumber,"%d",col);
+				fputs("leak ",fichero);
+				fputs(rowNumber,fichero);
+				fputs(" ",fichero);
+				fputs(colNumber,fichero);
+				fputs(" ",fichero);
+				fputc(dir,fichero);
+			}
+			if(dir=='E'){
+				sprintf(rowNumber,"%d",row);
+				sprintf(colNumber,"%d",col-1);
+				fputs("leak ",fichero);
+				fputs(rowNumber,fichero);
+				fputs(" ",fichero);
+				fputs(colNumber,fichero);
+				fputs(" ",fichero);
+				fputc(dir,fichero);
+			}
+			if(dir=='O'){
+				sprintf(rowNumber,"%d",row);
+				sprintf(colNumber,"%d",col+1);
+				fputs("leak ",fichero);
+				fputs(rowNumber,fichero);
+				fputs(" ",fichero);
+				fputs(colNumber,fichero);
+				fputs(" ",fichero);
+				fputc(dir,fichero);
+			}
+			fputc('\n',fichero);
+		}else{
+			if(dir=='N'){
+				printf("leak %d %d %c\n",row+1, col, dir);
+			}
+			if(dir=='S'){
+				printf("leak %d %d %c\n",row-1, col, dir);
+			}
+			if(dir=='E'){
+				printf("leak %d %d %c\n",row, col-1, dir);
+			}
+			if(dir=='O'){
+				printf("leak %d %d %c\n",row, col+1, dir);
+			}
 		}
-		if(dir=='S'){
-			printf("leak %d %d %c\n",row-1, col, dir);
-		}
-		if(dir=='E'){
-			printf("leak %d %d %c\n",row, col-1, dir);
-		}
-		if(dir=='O'){
-			printf("leak %d %d %c\n",row, col+1, dir);
-		}
+		
 }
 int** copy(int** matriz, int matrizRows, int matrizColumns){
 	int **copy= malloc(matrizRows*sizeof(int *));
