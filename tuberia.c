@@ -31,11 +31,12 @@ typedef struct Requirements{
     char folderName[40];
 }Requirements;
 
-bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
+void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
 void actionsMenu( int** matriz,char action[], TapsOrDrains *tapsOrDrainsArray, int taps, int drains,int matrizRows,int matrizColumns, Requirements game);
 void destruirMatriz(int **matriz, const int matrizRows);
 int** crearMatriz(const int matrizRows, const int matrizColumns);
 int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns);
+int cargarMatrizDeFile(int ** matriz, const int matrizRows, const int matrizColumns,FILE *fp);
 void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[], char folder[]);
 void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
 void printLeak(int x, int y, char dir,Requirements game);
@@ -51,8 +52,11 @@ int main(int args_count, char *args[]){
 	TapsOrDrains* tapsOrDrainsArray;
     Requirements game;
     int** matriz;
-    int waterTaps, drains, matrizRows, matrizColumns, rowWaterTap, columnWaterTap, rowDrain, columnDrain;
+    int waterTaps, drains, matrizRows, matrizColumns;
     int error=0;
+    int rowWaterTap, columnWaterTap;
+	int rowDrain, columnDrain;
+	char dir;
     
     //indetify what arguments are giving 
     strcpy(game.printFormat,"-ot" ); //default format
@@ -78,24 +82,70 @@ int main(int args_count, char *args[]){
     }
     //if the arguments is -it it reads from the standar input
     if(strcmp(game.readingFormat,"-it" ) == 0){
-		int x,y;
-		char dir;
-		scanf("%d%d%d%d", &matrizRows, &matrizColumns, &waterTaps, &drains);
-		tapsOrDrainsArray = malloc((waterTaps+drains) * sizeof *tapsOrDrainsArray);
-		for(int numOfWTaps=0;numOfWTaps<waterTaps;numOfWTaps++){
-			scanf("%d %d %c",&x,&y,&dir);
-			tapsOrDrainsArray[numOfWTaps].x=x;
-			tapsOrDrainsArray[numOfWTaps].y=y;
-			tapsOrDrainsArray[numOfWTaps].dir =dir;
+		
+		if(strcmp(game.folderName,"" ) == 0){
+			
+			scanf("%d%d%d%d", &matrizRows, &matrizColumns, &waterTaps, &drains);
+			tapsOrDrainsArray = malloc((waterTaps+drains) * sizeof *tapsOrDrainsArray);
+			for(int numOfWTaps=0;numOfWTaps<waterTaps;numOfWTaps++){
+				scanf("%d %d %c",&rowWaterTap,&columnWaterTap,&dir);
+				tapsOrDrainsArray[numOfWTaps].x=rowWaterTap;
+				tapsOrDrainsArray[numOfWTaps].y=columnWaterTap;
+				tapsOrDrainsArray[numOfWTaps].dir =dir;
+			}
+			for(int numOfDrains=waterTaps;numOfDrains<(waterTaps+drains);numOfDrains++){
+				scanf("%d %d %c",&rowDrain,&columnDrain,&dir);
+				tapsOrDrainsArray[numOfDrains].x=rowDrain;
+				tapsOrDrainsArray[numOfDrains].y=columnDrain;
+				tapsOrDrainsArray[numOfDrains].dir =dir;
+			}
+			matriz= crearMatriz(matrizRows, matrizColumns);
+			error=cargarMatriz(matriz, matrizRows, matrizColumns);
+		}else{
+			FILE *fp;
+			char blanco;
+			fp = fopen(game.folderName, "r");
+			matrizRows=fgetc(fp)-48;
+			blanco=fgetc(fp);
+			matrizColumns=fgetc(fp)-48;
+			blanco=fgetc(fp);
+			waterTaps=fgetc(fp)-48;
+			blanco=fgetc(fp);
+			drains=fgetc(fp)-48;
+			blanco=fgetc(fp);
+			blanco=fgetc(fp);
+			tapsOrDrainsArray = malloc((waterTaps+drains) * sizeof *tapsOrDrainsArray);
+			
+			for(int numOfWTaps=0;numOfWTaps<waterTaps;numOfWTaps++){
+				rowWaterTap=fgetc(fp)-48;
+				blanco=fgetc(fp);
+				columnWaterTap=fgetc(fp)-48;
+				blanco=fgetc(fp);
+				dir=fgetc(fp);
+				blanco=fgetc(fp);
+				tapsOrDrainsArray[numOfWTaps].x=rowWaterTap;
+				tapsOrDrainsArray[numOfWTaps].y=columnWaterTap;
+				tapsOrDrainsArray[numOfWTaps].dir =dir;
+			}
+			
+			for(int numOfDrains=waterTaps;numOfDrains<(waterTaps+drains);numOfDrains++){
+				rowDrain=fgetc(fp)-48;
+				blanco=fgetc(fp);
+				columnDrain=fgetc(fp)-48;
+				blanco=fgetc(fp);
+				dir=fgetc(fp);
+				blanco=fgetc(fp);
+				tapsOrDrainsArray[numOfDrains].x=rowDrain;
+				tapsOrDrainsArray[numOfDrains].y=columnDrain;
+				tapsOrDrainsArray[numOfDrains].dir =dir;
+			}
+			matriz= crearMatriz(matrizRows, matrizColumns);
+			error=cargarMatrizDeFile(matriz, matrizRows, matrizColumns,fp);
+			fclose(fp);
+			
+			
 		}
-		for(int numOfDrains=waterTaps;numOfDrains<(waterTaps+drains);numOfDrains++){
-			scanf("%d %d %c",&x,&y,&dir);
-			tapsOrDrainsArray[numOfDrains].x=x;
-			tapsOrDrainsArray[numOfDrains].y=y;
-			tapsOrDrainsArray[numOfDrains].dir =dir;
-		}
-		matriz= crearMatriz(matrizRows, matrizColumns);
-		error=cargarMatriz(matriz, matrizRows, matrizColumns);
+		
 	}else{
 		//if the argument is
 	}
@@ -194,6 +244,25 @@ int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
 	return 0;
 
 }
+int cargarMatrizDeFile(int ** matriz, const int matrizRows, const int matrizColumns,FILE *fp){
+	int num;
+	char blanco;
+    blanco=fgetc(fp);
+    for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
+        for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
+			num=fgetc(fp);
+			blanco=fgetc(fp);
+			if((num>=48)&&(num<=57)){
+				//printf("%d\n", num-48);
+				matriz[filas_cont][columna_cont]=(num-48);
+			}else{
+				//printf("%d\n", (int)num-55);
+				matriz[filas_cont][columna_cont]=(int)num-55;
+			}
+        }
+    }	
+    return 0;
+}
 /*
  * Efe:
  * Mod:
@@ -201,30 +270,35 @@ int cargarMatriz(int ** matriz, const int matrizRows, const int matrizColumns){
  */
 void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[], char folder[]){
 	// if the print format is -ot or its the default format, print in the standard output
-	putchar('\n');
 	FILE * fichero;
-	fichero = fopen( folder ,"a");
-	fputs("\n",fichero);
+	if(strcmp(folder,"" ) != 0){
+		fichero = fopen( folder ,"a");
+	}
 	if( (strcmp( printFormat,"-ot" ) == 0)||(strcmp( printFormat,"" ) == 0) ){
 		for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
 			for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
-				if(fichero != NULL){
-					char celda[12];
+				//imprimir en el archivo
+				if(strcmp(folder,"" ) != 0){
+					char celda[12]="";
 					sprintf(celda,"%d",matriz[filas_cont][columna_cont]);
 					fputs(celda,fichero);
 					fputs(" ",fichero);
+					printf("%s ",celda);
+					
 				}else{
+					//imprimir en formato nomal
 					printf("%d ",matriz[filas_cont][columna_cont]);
 				}
 				    
 			}
-			if(fichero != NULL){fputs("\n",fichero);}
+			if(strcmp(folder,"" ) != 0){ fputs("\n",fichero); }
 			putchar('\n');
 		}
 	}
 }
 void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
-	
+	//bool leak=false;
+	//printf("inicialice el boola false \n");
 	int rowCell=row;
 	int columnCell=column;
 	//Subrutina para evaluar la celda del nivel
@@ -233,8 +307,7 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 	//Condicionar si la celda es 0
 	if( (matriz[rowCell][columnCell])==0){
 		//Informar del error
-		printLeak(row, column, dir, game);
-		//printf("leak %d %d %c\n",row, column, dir);
+		printf("leak %d %d %c\n",row+1, column+1, dir);
 	}else
 	//Condicionar si la celda es 1
 	if(matriz[rowCell][columnCell]==1){
@@ -309,7 +382,7 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 		//Ejecutar subrutina para ir al sur de la celda
 		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 	}else
-	//Condicionar si la celda es 12
+	//Condicionar si la celda es C
 	if(matriz[rowCell][columnCell]==12){
 		//Ejecutar subrutina para ir al norte de la celda
 		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
@@ -340,7 +413,7 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 		goTo(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
 		//Ejecutar subrutina para ir al oeste de la celda
 		goTo(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);   
-		//Ejecutar subrutina para ir al sur de la celda
+		//Ejecutar subrutina para ir al sur de la celda	
 		goTo(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game); 
 		//Ejecutar subrutina para ir al este de la celda
 		goTo(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
@@ -350,47 +423,47 @@ void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tap
 
 //Subrutina para ir a la direccion requerida 
 //Se ocupa por parámetros la fila y la columna y el punto cardinal 
-bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
+void goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
 	//Condicionar si la celda se salió del rango
 	if((row>=0 && column>=0) &&(row<matrizRows&&column<matrizColumns)){
 		//Condicionar si la celda fue visitada
 		if(copyMatriz[row][column]==-1){
 			//retornar
-			return true;
+			return ;
 		}
 		//Condicionar si la celda es un cero
 		if(matriz[row][column]==0){
 			printLeak(row, column, dir, game);
-			return false;
+			return ;
 		}
 		//Condicionar si la celda no tiene su punto cardinal opuesto
 		if(dir=='N'){
 			if( (matriz[row][column]==1) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==12) ||(matriz[row][column]==13) ){
 				printLeak(row, column, dir, game);
-				return false;
+				return ;
 			}
 			
 		}else{
 			if(dir=='O'){
 				if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==10) ||(matriz[row][column]==11) ){
 							printLeak(row, column, dir, game);
-							return false;
+							return ;
 						}
 			
 			}else{
 				if(dir=='E'){
 					if( (matriz[row][column]==2) ||(matriz[row][column]==4) ||(matriz[row][column]==6) ||(matriz[row][column]==8) ||(matriz[row][column]==10) ||(matriz[row][column]==12) ||(matriz[row][column]==14) ){
 							printLeak(row, column, dir, game);
-							return false;
+							return ;
 						}
 				}else{
 					if(dir=='S'){
 						if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==6) ||(matriz[row][column]==7) ){
 							printLeak(row, column, dir, game);
-							return false;
+							return ;
 						}
 					}else{
-					
+						return ;
 					}
 				}
 			}	
@@ -401,6 +474,7 @@ bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 		if(matriz[row][column]>=0 && matriz[row][column]<=15){
 			//Ejecutar subrutina para evaluar la siguiente celda
 			validateLevel(matriz, row, column, dir, tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns,copyMatriz, game);
+			//return true;
 		} 
 	}else{
 		int rowC=row+1;
@@ -420,12 +494,12 @@ bool goTo(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsA
 		//Condicionar si la celda es la fuente o el desague
 		for(int waterTapOrDrains=0; waterTapOrDrains<taps+drains; waterTapOrDrains++){
 			if( (tapsOrDrainsArray[waterTapOrDrains].dir==dir)&&(tapsOrDrainsArray[waterTapOrDrains].x==rowC)&&(tapsOrDrainsArray[waterTapOrDrains].y==colC) ){
-				return true;
+				return ;
 			}
 		}
 		printLeak(row, column, dir, game);
+		return ;
 	}
-	return true;
 //Fin de la subrutina 
 }
 void printLeak(int x, int y, char dir,Requirements game){
@@ -505,7 +579,6 @@ int** copy(int** matriz, int matrizRows, int matrizColumns){
 	}
 	return copy;
 }
-
 
 
 
