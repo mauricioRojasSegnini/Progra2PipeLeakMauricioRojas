@@ -631,6 +631,12 @@ int** copy(int** matriz, int matrizRows, int matrizColumns){
 	}
 	return copy;
 }
+/*
+ * Efe: subrutina para resolver el nivel, encuentra la tuberia que esta dando la fuga y la rota para tapar la fuga
+ * si no tapa la fuga, la fuga no tiene solucion
+ * Mod: modifica la matriz de la tuberia, por la rotacion de la misma celda
+ * Req: requiere de la matriz, filas, columnas, las fuentes y drenajes y los parametos de tamano
+ */
 void solveLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
 	int rowCell=row;
 	int columnCell=column;
@@ -753,6 +759,11 @@ void solveLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOr
 	}
 	
 }
+/*
+ * subrutina para verificar la tuberia, si la tuberia tiene una fuga, se busca la solucion rotando la misma pieza
+ * metodo recursivo
+ * mod:rota la tuberia y cambia su valor en la matriz
+ */
 void verify(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
 	//Condicionar si la celda se salió del rango
 	if((row>=0 && column>=0) &&(row<matrizRows&&column<matrizColumns)){
@@ -835,6 +846,11 @@ void verify(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrain
 		return ;
 	}
 }
+/*
+ * Efe: metodo para cambiarle el valor a la celda de la matriz por la pieza de tuberia rotada
+ * Mod: modifica el valor de la celda
+ */
+ 
 int ** rotatePipe(int row,int column, char dir, int**matriz){
 	int celda=matriz[row][column];
 	int rotaciones;
