@@ -46,7 +46,12 @@ int cargarMatrizDeFile(int ** matriz, const int matrizRows, const int matrizColu
 void printGame(int **matriz, const int matrizRows, const int matrizColumns, char printFormat[], char folder[]);
 void validateLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
 void printLeak(int x, int y, char dir,Requirements game);
+void solveLevel( int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
+void verify(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game);
 int** copy(int** matriz, int matrizRows, int matrizColumns);
+int ** rotatePipe(int row,int column, char dir, int**matriz);
+void printHeader(int matrizRows,int matrizColumns,int taps, int drains,TapsOrDrains *tapsOrDrainsArray, int **matriz);
+int** resetCopyMatriz(int **copyMatriz,int matrizRows, int matrizColumns);
 /*
  * this is the main program where it contains all the subroutines required to solve, convert or validate the level
  * and the subroutine to print in the format that the user wants  
@@ -188,14 +193,16 @@ int main(int args_count, char *args[]){
  */
 void actionsMenu(int** matriz, char action[], TapsOrDrains *tapsOrDrainsArray,int taps, int drains,int matrizRows,int matrizColumns,Requirements game){
 	//si el usuario ingreso la accion de validar
-	 if(strcmp( action,"validate" ) == 0){
 	//crear una copia de la matriz para ir marcando las celdas visitadas 
 	int **copyMatriz=copy(matriz, matrizRows, matrizColumns);
+	if(strcmp( action,"validate" ) == 0){
 	//ejecutar subrutina para validar la matriz de tuberia
 	validateLevel( matriz, tapsOrDrainsArray[0].xRow-1,tapsOrDrainsArray[0].yColumn-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray,taps,drains, matrizRows,matrizColumns,copyMatriz, game);
 	}else{
 		if(strcmp(action,"solve" ) == 0){
-			printf("subrutina para resolver\n");
+			//subrutina para resolver
+			solveLevel( matriz, tapsOrDrainsArray[0].xRow-1,tapsOrDrainsArray[0].yColumn-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray,taps,drains, matrizRows,matrizColumns,copyMatriz, game);
+			printHeader(matrizRows, matrizColumns, taps, drains, tapsOrDrainsArray, matriz);
 		}else{
 			if(strcmp(action,"convert" ) == 0){
 				printf("subrutina para convertir\n");
@@ -624,5 +631,290 @@ int** copy(int** matriz, int matrizRows, int matrizColumns){
 	}
 	return copy;
 }
-
+void solveLevel(int** matriz, int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray,int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
+	int rowCell=row;
+	int columnCell=column;
+	//Subrutina para evaluar la celda del nivel
+	//Asignarle el valor de la celda como visitada
+	copyMatriz[rowCell][columnCell]=-1;
+	//Condicionar si la celda es 0
+	if( (matriz[rowCell][columnCell])==0){
+		//Informar del error
+		return;
+	}else
+	//Condicionar si la celda es 1
+	if(matriz[rowCell][columnCell]==1){
+		//Cambiar el valor de la variable dirección por O
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 2
+	if(matriz[rowCell][columnCell]==2){
+		//Ejecutar subrutina para ir al sur de la celda
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 3
+	if(matriz[rowCell][columnCell]==3){
+		//Ejecutar subrutina para ir al oeste de la celda
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al sur de la celda
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 4
+	if(matriz[rowCell][columnCell]==4){
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 5
+	if(matriz[rowCell][columnCell]==5){
+		//Ejecutar subrutina para ir al oeste de la celda
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 6
+	if(matriz[rowCell][columnCell]==6){
+		//Ejecutar subrutina para ir al sur de la celda
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else 
+	//Condicionar si la celda es 7
+	if(matriz[rowCell][columnCell]==7){
+		//Ejecutar subrutina para ir al oeste de la celda
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al sur de la celda
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 8
+	if(matriz[rowCell][columnCell]== 8){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 9
+	if(matriz[rowCell][columnCell]==9){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al oeste de la celda
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es A	
+	if(matriz[rowCell][columnCell]==10){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);	
+		//Ejecutar subrutina para ir al sur de la celda
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es B
+	if(matriz[rowCell][columnCell]==11 ){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al oeste de la celda
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al sur de la celda
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es C
+	if(matriz[rowCell][columnCell]==12){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es 13
+	if(matriz[rowCell][columnCell]==13){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al oeste de la celda
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es E
+	if(matriz[rowCell][columnCell]==14){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al sur de la celda
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game); 
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}else
+	//Condicionar si la celda es F
+	if(matriz[rowCell][columnCell]==15){
+		//Ejecutar subrutina para ir al norte de la celda
+		verify(matriz,rowCell-1,columnCell,'N',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		//Ejecutar subrutina para ir al oeste de la celda
+		verify(matriz,rowCell,columnCell-1,'O',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);   
+		//Ejecutar subrutina para ir al sur de la celda	
+		verify(matriz,rowCell+1,columnCell,'S',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game); 
+		//Ejecutar subrutina para ir al este de la celda
+		verify(matriz,rowCell,columnCell+1,'E',tapsOrDrainsArray,taps, drains,  matrizRows,  matrizColumns,copyMatriz, game);
+	}
+	
+}
+void verify(int **matriz,int row, int column, char dir,TapsOrDrains *tapsOrDrainsArray, int taps, int drains, int matrizRows, int matrizColumns,int **copyMatriz,Requirements game){
+	//Condicionar si la celda se salió del rango
+	if((row>=0 && column>=0) &&(row<matrizRows&&column<matrizColumns)){
+		//Condicionar si la celda fue visitada
+		if(copyMatriz[row][column]==-1){
+			//retornar
+			return ;
+		}
+		//Condicionar si la celda es un cero
+		if(matriz[row][column]==0){
+			return;
+		}
+		//Condicionar si la celda no tiene su punto cardinal opuesto
+		if(dir=='N'){
+			if( (matriz[row][column]==1) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==12) ||(matriz[row][column]==13) ){
+				matriz=rotatePipe(row, column, dir, matriz);
+				solveLevel(matriz,tapsOrDrainsArray[0].xRow-1,tapsOrDrainsArray[0].yColumn-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray, taps, drains, matrizRows, matrizColumns, copyMatriz,game);
+				return ;
+			}
+			
+		}else{
+			if(dir=='O'){
+				if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==8) ||(matriz[row][column]==9) ||(matriz[row][column]==10) ||(matriz[row][column]==11) ){
+							matriz=rotatePipe(row, column, dir, matriz);
+							solveLevel(matriz,tapsOrDrainsArray[0].xRow-1,tapsOrDrainsArray[0].yColumn-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray, taps, drains, matrizRows, matrizColumns, copyMatriz,game);
+							return ;
+						}
+			
+			}else{
+				if(dir=='E'){
+					if( (matriz[row][column]==2) ||(matriz[row][column]==4) ||(matriz[row][column]==6) ||(matriz[row][column]==8) ||(matriz[row][column]==10) ||(matriz[row][column]==12) ||(matriz[row][column]==14) ){
+							matriz=rotatePipe(row, column, dir, matriz);
+							solveLevel(matriz,tapsOrDrainsArray[0].xRow-1,tapsOrDrainsArray[0].yColumn-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray, taps, drains, matrizRows, matrizColumns, copyMatriz,game);
+							return ;
+						}
+				}else{
+					if(dir=='S'){
+						if( (matriz[row][column]==1) ||(matriz[row][column]==2) ||(matriz[row][column]==3) ||(matriz[row][column]==4) ||(matriz[row][column]==5) ||(matriz[row][column]==6) ||(matriz[row][column]==7) ){
+							matriz=rotatePipe(row, column, dir, matriz);
+							solveLevel(matriz, tapsOrDrainsArray[0].xRow-1,tapsOrDrainsArray[0].yColumn-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns,copyMatriz, game);
+							return ;
+						}
+					}else{
+						return ;
+					}
+				}
+			}	
+		}
+		//Condicionar si la celda tiene otro numero
+		if(matriz[row][column]>=0 && matriz[row][column]<=15){
+			//Ejecutar subrutina para evaluar la siguiente celda
+			solveLevel(matriz, row, column, dir, tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		} 
+	}else{
+		int rowC=row+1;
+		int colC=column+1;
+		if(dir=='N'){
+			rowC=rowC+1;
+		}
+		if(dir=='S'){
+			rowC=rowC-1;
+		}
+		if(dir=='E'){
+			colC=colC-1;
+		}
+		if(dir=='O'){
+			colC=colC+1;
+		}
+		//Condicionar si la celda es la fuente o el desague
+		for(int waterTapOrDrains=0; waterTapOrDrains<taps+drains; waterTapOrDrains++){
+			if( (tapsOrDrainsArray[waterTapOrDrains].dir==dir)&&(tapsOrDrainsArray[waterTapOrDrains].xRow==rowC)&&(tapsOrDrainsArray[waterTapOrDrains].yColumn==colC) ){
+				return ;
+			}
+		}
+		rowC=rowC-1;
+		colC=colC-1;
+		matriz=rotatePipe(rowC, colC, dir, matriz);
+		copyMatriz=resetCopyMatriz( copyMatriz, matrizRows,  matrizColumns);
+		solveLevel(matriz, tapsOrDrainsArray[0].xRow-1,tapsOrDrainsArray[0].yColumn-1, tapsOrDrainsArray[0].dir,tapsOrDrainsArray, taps,  drains,  matrizRows,  matrizColumns,copyMatriz, game);
+		return ;
+	}
+}
+int ** rotatePipe(int row,int column, char dir, int**matriz){
+	int celda=matriz[row][column];
+	int rotaciones;
+	int total=15;
+	//printf("celda a rotar %d\n",celda);
+	if(celda!=0 && celda!=15){
+		if(celda%3==0){
+			rotaciones=3;
+			matriz[row][column]=(celda+rotaciones)%total;
+		}
+		if(celda%5==0){
+			if(celda==5){
+				matriz[row][column]=10;
+			}else{
+				matriz[row][column]=5;
+			}
+		}
+		if((celda==7)||(celda==11)||(celda==13)||(celda==14)){
+			if(celda==7){
+				matriz[row][column]=11;
+			}else{
+				if(celda==11){
+					matriz[row][column]=13;
+				}else{
+					if(celda==13){
+						matriz[row][column]=14;
+					}else{
+						if(celda==14){
+							matriz[row][column]=7;
+						}
+					}
+				}
+			}
+		}
+		if((celda==1)||(celda==2)||(celda==4)||(celda==8)){
+			if(celda==1){
+				matriz[row][column]=2;
+			}else{
+				if(celda==2){
+					matriz[row][column]=4;
+				}else{
+					if(celda==4){
+						matriz[row][column]=8;
+					}else{
+						if(celda==8){
+							matriz[row][column]=1;
+						}
+					}
+				}
+			}
+		}
+		
+	}else{
+		printf("it cannot be solved\n");
+	}
+	return matriz;
+}
+/*
+ * Subrutina para imprimir el encabezado de los datos de entrada
+ * no modifica solo imprime
+ */
+void printHeader(int matrizRows,int matrizColumns,int taps, int drains,TapsOrDrains *tapsOrDrainsArray, int **matriz){
+	printf("\n%d %d %d %d\n", matrizRows,matrizColumns, taps, drains);
+	//imprimir hasta la cantidad de fuentes de agua
+	for(int numOfWTaps=0;numOfWTaps<taps;numOfWTaps++){
+		printf("%d %d %c\n",tapsOrDrainsArray[numOfWTaps].xRow,tapsOrDrainsArray[numOfWTaps].yColumn,tapsOrDrainsArray[numOfWTaps].dir);
+	}
+	//imprimir hasta la cantidad de drenajes
+	for(int numOfDrains=taps;numOfDrains<(taps+drains);numOfDrains++){
+		printf("%d %d %c\n",tapsOrDrainsArray[numOfDrains].xRow,tapsOrDrainsArray[numOfDrains].yColumn,tapsOrDrainsArray[numOfDrains].dir);
+	}
+	printf("\n");
+}
+int** resetCopyMatriz(int **copyMatriz,int matrizRows, int matrizColumns){
+	for(int filas_cont=0;filas_cont<matrizRows; filas_cont++){
+		for(int columna_cont=0;columna_cont<matrizColumns; columna_cont++){
+			copyMatriz[filas_cont][columna_cont]=0;
+		}
+	}
+				
+	return copyMatriz;
+}
 
