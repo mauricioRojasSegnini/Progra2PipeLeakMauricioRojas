@@ -1,0 +1,187 @@
+Diseño:
+Lectura de comandos (invocacion) 
+Subrutina para leer los argumentos del programa.
+Crear variable para la acción e inicializar variable el valor de nulo
+Crear variable para el formato de lectura e inicializar variable el valor de nulo
+Crear variable para el formato de impresión e inicializar variable el valor de nulo
+Crear variable para el nombre del archivo e inicializar variable el valor de nulo
+Crear subrutina para analizar los argumentos en la entrada
+Fin de la subrutina 
+Subrutina para analizar los argumentos.
+Repita desde cero hasta el final de los argumentos.
+Condicionar si el argumento es igual a cualquiera de las acciones disponibles por el programa
+    Cambiar el valor de la variable de las acciones 
+Condicionar si el argumento es igual a cualquiera de los formatos de lectura disponibles por el programa
+Cambiar el valor de la variable del formato de lectura
+Condicionar si el argumento es igual a cualquiera de los formatos de impresión disponibles por el programa
+    Cambiar el valor de la variable del formato de impresión
+Condicionar si hay nombre de archivo para imprimir el resultado en ese archivo
+Cambiar el valor de la variable del nombre de archivo 
+Fin de la subrutina 
+ Validar
+Subrutina para validar el nivel y reportar si hay fugas dentro de la tubería
+Crear variable para filas y columnas 
+Crear variable para la cantidad de fuentes de agua 
+Crear variable para la cantidad de desagües 
+Leer y cambiar el valor de la variable para las filas y condicionar si son válidos los datos  
+Leer y cambiar el valor de la variable para las columnas y condicionar si son válidos los datos
+Leer y cambiar el valor de la variable para la cantidad de fuentes y condicionar si son válidos los datos
+Leer y cambiar el valor de la variable para la cantidad de desagües y condicionar si son válidos los datos
+Repetir hasta la cantidad de fuentes de agua 
+    Leer la ubicación de las fuentes de agua
+Repetir hasta la cantidad de desagues 
+    Leer la ubicación de los desagües 
+Crear variable para la matriz del nivel de tamano fila columna 
+Crear subrutina para crear la matriz del nivel
+Crear subrutina para evaluar el nivel, mandando por parámetros la fuente de agua
+Condicionar si los datos son incorrectos 
+    Imprimir mensaje de datos incorrectos 
+Fin de la subrutina 
+Subrutina para crear la matriz
+Repetir hasta el número de columnas
+Repetir hasta el número de filas 
+        Leer el valor de la entrada
+        Cambiar el valor de la celda 
+Retornar la matriz
+Fin de la subrutina 
+/*
+Subrutina para evaluar la celda del nivel
+Para esta subrutina se va a necesitar de parámetros la fila y la columna de la celda que se va analizar 
+    Crear una variable para la dirección 
+    Asignarle el valor de la celda como visitada
+    Condicionar si la celda es 0
+        Informar del error
+Condicionar si la celda es 1
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda (fila, columna-1, direcion)
+    Condicionar si la celda es 2
+        Cambiar el valor de la variable dirección por S
+        Ejecutar subrutina para ir al sur de la celda
+    Condicionar si la celda es 3
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda
+        Cambiar el valor de la variable dirección por S
+        Ejecutar subrutina para ir al sur de la celda
+    Condicionar si la celda es 4
+        Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+    Condicionar si la celda es 5
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda
+        Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+    Condicionar si la celda es 6
+        Cambiar el valor de la variable dirección por S
+        Ejecutar subrutina para ir al sur de la celda
+        Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+    Condicionar si la celda es 7
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda
+        Cambiar el valor de la variable dirección por S
+        Ejecutar subrutina para ir al sur de la celda
+        Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+    Condicionar si la celda es 8
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+    Condicionar si la celda es 9
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda
+    Condicionar si la celda es A
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+        Cambiar el valor de la variable dirección por S
+        Ejecutar subrutina para ir al sur de la celda
+    Condicionar si la celda es B
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda
+        Cambiar el valor de la variable dirección por S
+        Ejecutar subrutina para ir al sur de la celda
+    Condicionar si la celda es C
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+    Condicionar si la celda es D
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda
+        Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+    Condicionar si la celda es E
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+        Cambiar el valor de la variable dirección por S
+        Ejecutar subrutina para ir al sur de la celda 
+        Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+    Condicionar si la celda es F
+        Cambiar el valor de la variable dirección por N
+        Ejecutar subrutina para ir al norte de la celda
+        Cambiar el valor de la variable dirección por O
+        Ejecutar subrutina para ir al oeste de la celda
+        Cambiar el valor de la variable dirección por S    
+        Ejecutar subrutina para ir al sur de la celda
+        Cambiar el valor de la variable dirección por E
+        Ejecutar subrutina para ir al este de la celda
+Fin de la subrutina 
+Subrutina para ir a la direccion requerida 
+Se ocupa por parámetros la fila y la columna y el punto cardinal 
+    Condicionar si la celda es la fuente
+        retornar
+    Condicionar si la celda es el desagüe
+        retornar
+    Condicionar si la celda se salió del rango
+        imprimir fuga la fila y la columna y la etiqueta
+        retornar
+    Condicionar si la celda es un cero
+        imprimir fuga la fila y la columna y la etiqueta
+        retornar
+    Condicionar si la celda no tiene su punto cardinal opuesto
+        imprimir fuga la fila y la columna y la etiqueta
+        retornar
+    Condicionar si la celda fue visitada
+        retornar
+    Condicionar si la celda tiene otro numero
+        Ejecutar subrutina para evaluar la siguiente celda
+        Mandar por parámetros la fila y la columna actual 
+Fin de la subrutina 
+ */
+
+    
+Resolver
+
+Subrutina para evaluar la celda del nivel
+Asignarle el valor de la celda como visitada
+//Condicionar si la celda es 0
+ //Informar del error
+Condicionar por cada tipo de tuberia 
+    Crear subtarea para verificar la tubería en cada dirección
+Subtarea para verificar la tuberia
+    Condicionar si la celda fue visitada
+Condicionar si la celda es un cero
+Condicionar si la celda no tiene coneccion con la tubería siguiente
+    Si no tiene coneccion
+        Subtarea para rotar la tuberia 
+Condicionar si la celda se salió del rango
+    si la celda es fuente de agua o es desague
+        Retornar
+    Sino rotar la tuberia
+Subtarea para rotar la tuberia
+Condicionar si la celda esta dentro del rango de tuberias
+    Si la celda es de tipo L
+        Rotar
+        Verificar la tuberia 
+    Si es horizontal o vertical
+        Rotar y verificar la tubería 
+    Si la tubería es una T
+        Rotar y verificar la tubería 
+    Si la tubería es un tapón
+        Rotar y verificar 
+
